@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div id="intro" class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+
+                <h1 class="text-center mt-5 text-primary">Welcome to Acme Products!!!</h1>
+
+                <h5 class="text-center mt-4"><a class="btn btn-primary font-weight-bold" href={% url 'product_list' %}>See All Products</a> </h5>
+
+                <h5 class="text-align mt-5">With this dashboard, you can:</h5>
+       
+                <ul>
+                    <li>Create a product</li>
+                    <li>Update a product</li>
+                    <li>Delete a product</li>
+                    <li>Bulk delete all products</li>
+                    <li>Bulk create products</li>
+                    <li>Add remaining :)</li>
+
+                </ul>
+                <br> <br>
+
+               
+
+            </div>
+        
+
+        </div>
+    </div>
+
+
+{% endblock content %}

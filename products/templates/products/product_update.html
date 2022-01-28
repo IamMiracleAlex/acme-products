@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+
+                <h1 class="text-center mt-4 text-primary">Acme Products</h1>
+                <h5 class="text-center mt-3">Please update your details</h5>
+            </div>
+
+
+            <div class="col-lg-6 mx-auto mt-4 mb-5">
+                <form class="form" action="{% url 'product_update' product.pk %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name"><strong>Your Name:</strong></label>
+                        {{form.name}}
+
+                        <label class="mt-3" for="sku"><strong>SKU:</strong></label>
+                        {{form.sku}}
+                        {{form.sku.errors}}
+                    
+
+                        <label class="mt-3" for="description"><strong>Description:</strong></label>
+                        {{form.description}}
+
+                        <button type="submit" class="btn btn-block btn-warning mt-3"> <i class="fas fa-edit"></i>
+                            Update</button>
+                            
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+
+{% endblock content %}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Acme Products</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0-11/css/all.min.css">
+
+    <style>
+        @media screen and (max-width: 767px) {
+            table {
+                width: 180% !important;
+            }
+        }
+/*     
+        @keyframes Slide_up {
+            0% {
+                transform: translateY(250px);
+            }
+    
+            100% {
+                transform: translateY(0);
+            }
+        }
+    
+        #intro {
+            animation: Slide_up 2.1s ease;
+        } */
+       
+    </style>
+
+</head>
+
+<body style="background-color: whitesmoke">
+
+       <!--nagivation bar container-->
+    <nav class="navbar navbar-expand-lg navbar-light pt-2 " style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <h3 class="ml-5">Acme Products</h3>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarNavDropdown" class="navbar-collapse collapse">
+            <ul class="navbar-nav mr-auto">
+
+            </ul>
+            <ul class="navbar-nav mr-4 ">
+
+                <li class="nav-item mr-5 ">
+                    <a class="nav-link text-black font-weight-bold" href="{% url 'product_create' %}">Add a Product</a>
+                </li>
+                <li class="nav-item mr-5">
+                    <a class="nav-link text-black font-weight-bold" href={% url 'product_list' %}>See All Products</a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+
+    {% block content %}
+    
+    
+    
+    {% endblock content %}
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+        {% block javascript %}
+        
+        
+        {% endblock javascript %}
+</body>
+
+</html>

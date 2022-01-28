@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+    <div id="intro" class="container">
+
+        <div class="row">
+            <div class="mx-auto mt-5">
+
+                <a href={% url 'product_create' %} class="btn btn-primary "> <i class="fas fa-plus"></i>
+                    Add A Product</a>
+
+                <a href={% url 'product_create' %} class="btn btn-primary"> <i class="fas fa-plus"></i>
+                    Bulk Upload Products</a>
+
+                <a href={% url 'product_delete_all' %} class="btn btn-danger delete-all" data-confirm="Are you sure you want to delete all products? This action is irreversible."> <i class="fas fa-trash"></i>
+                    Delete All Products</a>
+            </div>        
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="text-center my-5 text-primary">All Products</h1>
+            </div>
+        </div>
+
+        <div class="row">
+             <div class="col-lg-8 mx-auto ">
+                    
+                {% if messages %}
+                <ul style="list-style: none;" class="text-center mt-4 mb-2 alert-success">
+                    {% for message in messages %}
+                    <li class="{{ message.tags }} ">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+
+
+    <!-- table -->
+    <div id="main" class="container">
+
+        <div class="table-responsive mb-5">
+            <table id="wishes" class="table  table-striped table-hover">
+
+                <thead class="alert-info">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Created At</th>
+                        <th scope="col">Updated At</th>
+                        <th scope="col">Update</th>
+                        <th scope="col">Erase</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.sku }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>{{ product.created_at }}</td>
+                        <td>{{ product.updated_at }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-warning" href="{% url 'product_update' product.pk %}">
+                                <i class="fas fa-edit"> </i>
+                                Update
+                            </a>
+                        </td>
+                        <td>
+                          
+                            <a href="{% url 'product_delete' product.pk %}" class="delete btn btn-sm btn-danger" data-confirm="Are you sure you want delete this product? This action is irreversible.">
+                                <i class="fas fa-trash"></i> Delete
+
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+        <!--  table-responsive -->
+
+    </div>
+    <!-- container -->
+
+{% endblock content %}
+
+
+{% block javascript %}
+
+    <script>
+        var deleteLinks = document.querySelectorAll('.delete');
+        var deleteAll = document.querySelectorAll('.delete-all');
+
+        for (var i = 0; i < deleteLinks.length; i++) {
+            deleteLinks[i].addEventListener('click', function (event) {
+                event.preventDefault();
+
+                var choice = confirm(this.getAttribute('data-confirm'));
+
+                if (choice) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        }
+        for (var i = 0; i < deleteAll.length; i++) {
+            deleteAll[i].addEventListener('click', function (event) {
+                event.preventDefault();
+
+                var choice = confirm(this.getAttribute('data-confirm'));
+
+                if (choice) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        }
+    </script>
+
+<!-- <script>
+    var deleteAll = document.querySelectorAll('.delete-all');
+
+
+    for (var i = 0; i < deleteAll.length; i++) {
+        deleteLinks[i].addEventListener('click', function (event) {
+            event.preventDefault();
+
+            var choice = confirm(this.getAttribute('data-confirm'));
+
+            if (choice) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+    }
+</script> -->
+
+{% endblock javascript %}
+
+
+
+<div class="row">
+    <!-- form -->
+    <!-- <div class="col-lg-6 mx-auto mt-4 mb-5"> -->
+
+            <!-- <div class="form-group"> -->
+                
+                <a href={% url 'product_create' %} class="btn btn-primary "> <i class="fas fa-plus"></i>
+                    Add A Product</a>
+
+                <a href={% url 'product_create' %} class="btn btn-primary"> <i class="fas fa-plus"></i>
+                    Bulk Upload Products</a>
+
+                <a href={% url 'product_create' %} class="btn btn-primary"> <i class="fas fa-plus"></i>
+                    Delete All Products</a>
+            <!-- </div> -->
+    <!-- </div> -->
+   
+           
+
+</div>
