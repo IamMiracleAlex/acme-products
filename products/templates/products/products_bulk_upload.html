@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block css %}
+
+<style>
+    code {
+        font-family: monospace;
+        color: white;
+    }
+    pre {
+        background-color: grey;
+        max-height: 200px;
+        max-width: 1000px;
+    }
+</style>
+
+{% endblock css %}
+
+
+{% block content %}
+
+
+    <div id="intro" class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="text-center mt-5 text-primary">Bulk Upload Products</h1>
+            </div>
+
+            <div class="col-lg-8 mx-auto ">
+                    
+                {% if messages %}
+                <ul style="list-style: none;" class="text-center mt-3 alert-success">
+                    {% for message in messages %}
+                    <li class="{{ message.tags }} ">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+    
+            <!-- form -->
+            <div class="col-lg-6 mx-auto mt-4 mb-2">
+                <form id="form"  action="{% url 'products_bulk_upload' %}" method="POST" enctype="multipart/form-data">
+                        <p id="head"></p>
+                        
+                    {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="upload-file"><strong>Upload CSV File:</strong></label>
+                            <br> 
+                            <input type="file" name='file' accept="text/csv" class="form-control-file" required>
+                           
+                            <br> 
+                
+                        <button type="submit" id="submit" class="btn btn-block btn-primary mt-3"> <i class="fas fa-plus"></i>
+                            Upload File</button>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="col-lg-8 mx-auto">
+                <pre id='stream-content'>
+                  
+                </pre>
+            </div>
+           
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+<script>
+  
+  var eventSource  = new EventSource("{% url 'stream_response' %}");
+
+  eventSource.onopen = function() {
+    console.log('Yay! its open?');
+  }
+
+  eventSource.onmessage = function(e) {
+    console.log(e)
+    final_data = JSON.parse(e.data)
+    content = "";
+
+    final_data.forEach(function (item){
+      content += buildPostContent(item['name'], item['sku'], item['is_active'], item['created_at'])
+    })
+
+        document.getElementById('stream-content').innerHTML = '';
+      document.getElementById('stream-content').innerHTML = content;
+      console.log(content)
+  }
+
+  eventSource.onerror = function(e) {
+    console.log(`error: ${e}`);
+  }
+
+  function buildPostContent(name, sku, is_active, created_at) {
+
+    content = `<code> ${name}, ${sku}, ${is_active}, ${created_at} </code> <br>`
+	return content
+
+  }
+
+
+</script>
+
+{% endblock javascript %}
