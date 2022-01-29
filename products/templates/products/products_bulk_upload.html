@@ -5,10 +5,9 @@
 <style>
     code {
         font-family: monospace;
-        color: white;
     }
     pre {
-        background-color: grey;
+        background-color: #e6e9ed;
         max-height: 200px;
         max-width: 1000px;
     }
@@ -89,7 +88,6 @@
       content += buildPostContent(item['name'], item['sku'], item['is_active'], item['created_at'])
     })
 
-        document.getElementById('stream-content').innerHTML = '';
       document.getElementById('stream-content').innerHTML = content;
       console.log(content)
   }
@@ -100,7 +98,7 @@
 
   function buildPostContent(name, sku, is_active, created_at) {
 
-    content = `<code> ${name}, ${sku}, ${is_active}, ${created_at} </code> <br>`
+    content = `<code> --> Creating:  ${name}, ${sku}, ${is_active}, ${created_at} </code> <br>`
 	return content
 
   }

@@ -123,9 +123,11 @@ def stream_response(request):
                     cls = DjangoJSONEncoder
                 )
 
-            # if not initial_data == data:
-            yield "\ndata: {}\n\n".format(data) 
-                # initial_data = data
+            if not initial_data == data:
+                yield "\ndata: {}\n\n".format(data) 
+                initial_data = data
+                
             time.sleep(0.4)
-    
+        
+
     return StreamingHttpResponse(event_stream(), content_type="text/event-stream")
