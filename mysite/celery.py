@@ -9,6 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
 app = Celery('mysite')
 app.conf.update(
     broker_url = settings.CELERY_BROKER_URL,
+    result_backend = settings.CELERY_BROKER_URL,
     timezone='Africa/Lagos',
     enable_utc=True,
 )
