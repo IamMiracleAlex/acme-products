@@ -140,7 +140,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://:p5b2e6cc0ca10aadf56c43c834cb220f063623f376c8642339b078e125fcc829f@ec2-3-230-60-238.compute-1.amazonaws.com:17440') 
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'amqp://localhost') 
 
 
 
