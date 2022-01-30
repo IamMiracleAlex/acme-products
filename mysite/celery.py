@@ -6,7 +6,7 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
 
-app = Celery('mysite', broker=settings.CELERY_BROKER_URL)
+app = Celery('mysite', broker=settings.CELERY_BROKER_URL, backend='django-db')
 # app.conf.update(
 #     broker_url = settings.CELERY_BROKER_URL,
 #     result_backend = settings.CELERY_BROKER_URL,
