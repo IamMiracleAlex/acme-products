@@ -10,8 +10,8 @@ from django.http import StreamingHttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
-from products.models import Product
-from products.forms import ProductForm
+from products.models import Product, WebHook
+from products.forms import ProductForm, WebHookForm
 from products.tasks import process_task
 
 
@@ -131,3 +131,56 @@ def stream_response(request):
         
 
     return StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+
+
+class WebHookListView(generic.ListView):
+    queryset = WebHook.objects.order_by('-created_at')
+    context_object_name = 'webhooks'
+    template_name = 'products/webhook_list.html'
+    paginate_by = 20
+
+
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        paginator = Paginator(queryset, self.paginate_by) 
+        page = self.request.GET.get('page')
+        try:
+            queryset = paginator.page(page)
+        except PageNotAnInteger:
+            # if page is not an intger deliver the first page
+            queryset = paginator.page(1)
+        except EmptyPage:
+            #  if page is out of range deliver last page of results
+            queryset = paginator.page(paginator.num_pages)
+        context['webhooks'] = queryset
+
+        return context
+
+    def get_queryset(self):
+            queryset = super().get_queryset()
+            q = self.request.GET.get('q')
+            
+            if q:
+                queryset = queryset.filter(name__icontains=q)
+
+            return queryset
+
+
+def webhook_delete(request, pk):
+    webhook = get_object_or_404(WebHook, pk=pk)
+    webhook.delete()
+    messages.success(request, 'Webhook deleted successfully!', extra_tags='alert')
+    return redirect('webhook_list')
+
+
+class WebHookCreateView(generic.CreateView):
+    model = WebHook
+    template_name = 'products/webhook_create.html'
+    form_class = WebHookForm
+    success_url = '/webhooks'
+
+    def get_success_url(self):
+        messages.success(self.request, 'Webhook added successfully', extra_tags='alert')
+        return super().get_success_url()
