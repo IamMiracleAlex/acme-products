@@ -25,7 +25,3 @@ def process_task(self, reader_list, ):
         self.retry(countdown=3, max_retries=5, exc=err)
 
     return 'Succeeded'
-
-
-# use results
-# use logs
