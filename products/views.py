@@ -1,5 +1,6 @@
 import csv, codecs, json, time
 from datetime import timedelta
+from zipfile import ZipFile
 
 from django.views import generic
 from django.shortcuts import redirect, get_object_or_404, render
@@ -102,16 +103,24 @@ def products_bulk_upload(request):
     if request.method == 'GET':
         return render(request, 'products/products_bulk_upload.html',)
 
-    #Try: upload zip, extract and then read
+    #Usage: upload zip, extract and then read
+    django_file = request.FILES.get('file')
+    ZipFile(django_file).extractall("/tmp")
+    file_name = django_file.name.split('.')[0] + '.csv'
 
+    file_path = f"/tmp/{file_name}"
+    with open(file_path, "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+        reader_list = list(reader)
+        process_task.delay(reader_list)
 
-
-
-    csv_file = request.FILES.get('file')
-    reader = csv.reader(codecs.iterdecode(csv_file, 'utf-8'))
-    next(reader)
-    reader_list = list(reader)
-    process_task.delay(reader_list)
+    # Usage: upload csv and read
+    # csv_file = request.FILES.get('file')
+    # reader = csv.reader(codecs.iterdecode(csv_file, 'utf-8'))
+    # next(reader)
+    # reader_list = list(reader)
+    # process_task.delay(reader_list)
       
     messages.success(request, 'Products upload in progress!', extra_tags='alert')
 
