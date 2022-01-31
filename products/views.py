@@ -7,9 +7,10 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 from products.models import Product, WebHook
 from products.signals import custom_post_save
@@ -92,28 +93,54 @@ def product_delete(request, pk):
 
 
 def delete_all(request):
-    # Make async?
     Product.objects.all().delete()
     messages.success(request, 'All products deleted successfully!', extra_tags='alert')
     return redirect('product_list')
 
+def handle_uploaded_file(f):
+    # write files in chunks
+    with open(f.name, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
+        # extract zip file
+        ZipFile(destination).extractall("/tmp")
+        file_name = destination.name.split('.')[0] + '.csv'
+
+    # process file and send to celery
+    file_path = f"/tmp/{file_name}"
+    with open(file_path, "r") as new_file:
+        reader = csv.reader(new_file)
+        next(reader)
+        reader_list = list(reader)[:500]
+        process_task.delay(reader_list)
+
+
+@csrf_exempt
 def products_bulk_upload(request):
 
     if request.method == 'GET':
         return render(request, 'products/products_bulk_upload.html',)
 
-    #Usage: upload zip, extract and then read
-    django_file = request.FILES.get('file')
-    ZipFile(django_file).extractall("/tmp")
-    file_name = django_file.name.split('.')[0] + '.csv'
+    #Usage: Use Ajax
+    print('is_ajax', request.is_ajax())
 
-    file_path = f"/tmp/{file_name}"
-    with open(file_path, "r") as f:
-        reader = csv.reader(f)
-        next(reader)
-        reader_list = list(reader)
-        process_task.delay(reader_list)
+    ajx_file = request.FILES.get('file')
+    handle_uploaded_file(ajx_file)
+
+    return JsonResponse({'msg':'<span style="color: white;">Products upload in progress!</span>'})
+   
+    #Usage: upload zip, extract and then read
+    # django_file = request.FILES.get('file')
+    # ZipFile(django_file).extractall("/tmp")
+    # file_name = django_file.name.split('.')[0] + '.csv'
+
+    # file_path = f"/tmp/{file_name}"
+    # with open(file_path, "r") as f:
+    #     reader = csv.reader(f)
+    #     next(reader)
+    #     reader_list = list(reader)
+    #     process_task.delay(reader_list)
 
     # Usage: upload csv and read
     # csv_file = request.FILES.get('file')
@@ -122,9 +149,9 @@ def products_bulk_upload(request):
     # reader_list = list(reader)
     # process_task.delay(reader_list)
       
-    messages.success(request, 'Products upload in progress!', extra_tags='alert')
+    # messages.success(request, 'Products upload in progress!', extra_tags='alert')
 
-    return redirect('products_bulk_upload')
+    # return redirect('products_bulk_upload')
 
 
 def stream_response(request):

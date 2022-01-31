@@ -15,7 +15,7 @@ def process_task(self, reader_list, ):
             is_active = random.choice([True, False])
 
             print(row[0], row[1], is_active, row[2])
-            product = Product.objects.filter(sku=row[1])
+            product = Product.objects.filter(sku__iexact=row[1])
             if product:
                 product.update(name=row[0], is_active=is_active, description=row[2])
             else:
