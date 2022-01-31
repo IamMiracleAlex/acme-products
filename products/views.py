@@ -11,6 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from products.models import Product, WebHook
+from products.signals import custom_post_save
 from products.forms import ProductForm, WebHookForm
 from products.tasks import process_task
 
@@ -19,15 +20,28 @@ class IndexView(generic.TemplateView):
     template_name = 'products/index.html'
 
 
-class ProductCreateView(generic.CreateView):
-    model = Product
+def product_create_view(request):
     template_name = 'products/product_create.html'
-    form_class = ProductForm
-    success_url = '/products'
+    form = ProductForm(request.POST)
 
-    def get_success_url(self):
-        messages.success(self.request, 'Product added successfully', extra_tags='alert')
-        return super().get_success_url()
+    if form.is_valid():
+        obj = form.save()
+        custom_post_save.send(sender=Product, instance=obj, created=True)
+        messages.success(request, 'Product added successfully', extra_tags='alert')
+
+        return redirect('product_list')
+    return render(request, template_name, {'form': form})
+
+# class ProductCreateView(generic.CreateView):
+#     model = Product
+#     template_name = 'products/product_create.html'
+#     form_class = ProductForm
+#     success_url = '/products'
+
+#     def get_success_url(self):
+#         # custom_post_save.send(sender=self.model, instance=self.get(), created=True)
+#         messages.success(self.request, 'Product added successfully', extra_tags='alert')
+#         return super().get_success_url()
 
 
 class ProductListView(generic.ListView):
@@ -75,6 +89,7 @@ class ProductUpdateView(generic.UpdateView):
     template_name = 'products/product_update.html'
 
     def get_success_url(self):
+        custom_post_save.send(sender=self.model, instance=self.get_object(), created=False)
         messages.success(self.request, 'Product updated successfully', extra_tags='alert')
         return super().get_success_url()
 
@@ -116,9 +131,9 @@ def stream_response(request):
         initial_data = ""
         while True:
             
-            last_second =  timezone.now() - timedelta(seconds=5)
+            last_minute =  timezone.now() - timedelta(minutes=1)
 
-            data = json.dumps(list(Product.objects.filter(updated_at__gte=last_second).values("name", 
+            data = json.dumps(list(Product.objects.filter(updated_at__gte=last_minute).values("name", 
                     "sku", "is_active", "created_at")),
                     cls = DjangoJSONEncoder
                 )

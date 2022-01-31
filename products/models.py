@@ -1,8 +1,10 @@
 from django.db import models
-from django.db.models.signals import post_save
+# from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import requests
+
+from products.signals import custom_post_save
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -43,8 +45,10 @@ class WebHook(models.Model):
 
 
 # Call Webhook after product creation or update
-@receiver(post_save, sender=Product)
+# @receiver(post_save, sender=Product)
+@receiver(custom_post_save, sender=Product)
 def call_webhooks(sender, instance, created, **kwargs):
+    print(sender, instance, created)
     webhooks = WebHook.objects.all()
     if created:
         webhooks = WebHook.objects.filter(action=WebHook.CREATE)
