@@ -32,17 +32,6 @@ def product_create_view(request):
         return redirect('product_list')
     return render(request, template_name, {'form': form})
 
-# class ProductCreateView(generic.CreateView):
-#     model = Product
-#     template_name = 'products/product_create.html'
-#     form_class = ProductForm
-#     success_url = '/products'
-
-#     def get_success_url(self):
-#         # custom_post_save.send(sender=self.model, instance=self.get(), created=True)
-#         messages.success(self.request, 'Product added successfully', extra_tags='alert')
-#         return super().get_success_url()
-
 
 class ProductListView(generic.ListView):
     queryset = Product.objects.order_by('-created_at')
@@ -113,10 +102,15 @@ def products_bulk_upload(request):
     if request.method == 'GET':
         return render(request, 'products/products_bulk_upload.html',)
 
+    #Try: upload zip, extract and then read
+
+
+
+
     csv_file = request.FILES.get('file')
     reader = csv.reader(codecs.iterdecode(csv_file, 'utf-8'))
     next(reader)
-    reader_list = list(reader)[:500]
+    reader_list = list(reader)
     process_task.delay(reader_list)
       
     messages.success(request, 'Products upload in progress!', extra_tags='alert')
@@ -142,7 +136,7 @@ def stream_response(request):
                 yield "\ndata: {}\n\n".format(data) 
                 initial_data = data
                 
-            time.sleep(0.4)
+            # time.sleep(0.4)
         
 
     return StreamingHttpResponse(event_stream(), content_type="text/event-stream")

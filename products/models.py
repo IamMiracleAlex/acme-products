@@ -1,5 +1,4 @@
 from django.db import models
-# from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import requests
@@ -45,7 +44,6 @@ class WebHook(models.Model):
 
 
 # Call Webhook after product creation or update
-# @receiver(post_save, sender=Product)
 @receiver(custom_post_save, sender=Product)
 def call_webhooks(sender, instance, created, **kwargs):
     print(sender, instance, created)
