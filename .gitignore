@@ -6,3 +6,4 @@ media/
 eded
 .idea/
 db.sqlite3
+.env
