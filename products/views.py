@@ -1,4 +1,5 @@
 import csv, codecs, json, time
+from mysite.settings import AWS_S3_BUCKET
 from datetime import timedelta
 from zipfile import ZipFile
 
@@ -11,6 +12,9 @@ from django.http import StreamingHttpResponse, JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+import boto3
 
 from products.models import Product, WebHook
 from products.signals import custom_post_save
@@ -112,7 +116,7 @@ def handle_uploaded_file(f):
     with open(file_path, "r") as new_file:
         reader = csv.reader(new_file)
         next(reader)
-        reader_list = list(reader)[:500]
+        reader_list = list(reader)
         process_task.delay(reader_list)
 
 
@@ -122,13 +126,26 @@ def products_bulk_upload(request):
     if request.method == 'GET':
         return render(request, 'products/products_bulk_upload.html',)
 
-    #Usage: Use Ajax
-    print('is_ajax', request.is_ajax())
+    # Usage: Upload url (Using AWS)
+    file_url = request.POST.get('file_url')
 
-    ajx_file = request.FILES.get('file')
-    handle_uploaded_file(ajx_file)
+    # process file and send to celery
+    with open(file_url, "r") as new_file:
+        reader = csv.reader(new_file)
+        next(reader)
+        reader_list = list(reader)
+        process_task.delay(reader_list)
 
-    return JsonResponse({'msg':'<span style="color: white;">Products upload in progress!</span>'})
+    messages.success(request, 'Products upload in progress!', extra_tags='alert')
+    return redirect('products_bulk_upload')
+
+    #Usage: Upload zip with Ajax, extract and read
+    # print('is_ajax', request.is_ajax())
+
+    # ajx_file = request.FILES.get('file')
+    # handle_uploaded_file(ajx_file)
+
+    # return JsonResponse({'msg':'<span style="color: white;">Products upload in progress!</span>'})
    
     #Usage: upload zip, extract and then read
     # django_file = request.FILES.get('file')
@@ -153,6 +170,33 @@ def products_bulk_upload(request):
 
     # return redirect('products_bulk_upload')
 
+@csrf_exempt
+def signed_url(request):
+    file_name = request.GET.get('file_name')
+    # file_type = request.GET.get('file_type')
+
+    #Usage: Upload CSV to S3
+    print('is_ajax', request.is_ajax())
+
+    client = boto3.client('s3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY, 
+                aws_secret_access_key=settings.AWS_SECRET_KEY,
+        )
+    presigned_url = client.generate_presigned_url(
+            ClientMethod = 'put_object',
+            Params = {
+                'Bucket': settings.AWS_S3_BUCKET,
+                'Key': file_name
+            },
+            ExpiresIn = 3600
+    )
+  
+    print(presigned_url)
+
+    return JsonResponse({
+        'url': presigned_url,
+        # 'url': 'https://%s.s3.amazonaws.com/%s' % (AWS_S3_BUCKET, file_name)
+        })
 
 def stream_response(request):
 

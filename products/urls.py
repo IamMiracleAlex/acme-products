@@ -15,5 +15,6 @@ urlpatterns = [
     path('webhooks/', views.WebHookListView.as_view(), name='webhook_list'),
     path('webhooks-delete/<int:pk>/', views.webhook_delete, name='webhook_delete'),
     path('webhooks-create/', views.WebHookCreateView.as_view(), name='webhook_create'),
+    path('signed-url/', views.signed_url, name='signed_url'),
 
 ]

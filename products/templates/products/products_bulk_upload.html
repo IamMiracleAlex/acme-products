@@ -22,11 +22,12 @@
     <div id="intro" class="container">
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                <h1 class="text-center mt-5 text-primary">Bulk Upload Products</h1>
+                <h1 class="text-center mt-5 py-5 text-primary">Bulk Upload Products</h1>
             </div>
 
             <div class="col-lg-8 mx-auto ">
-                    
+                <p id='message' class="text-center mt-3 alert-success"> </p>
+
                 {% if messages %}
                 <ul style="list-style: none;" class="text-center mt-3 alert-success">
                     {% for message in messages %}
@@ -47,13 +48,16 @@
                         <div class="form-group">
                             <label for="upload-file"><strong>Upload CSV File:</strong></label>
                             <br> 
-                            <input id="file" type="file" name='file' accept=".zip" class="form-control-file" required>
-                            {% comment %} <input type="file" name='file' accept="text/csv" class="form-control-file" required> {% endcomment %}
-                           
+                            {% comment %} <input id="file" type="file" name='file' accept=".zip" class="form-control-file" required> {% endcomment %}
+                            <input id="file" type="file" name='file' accept="text/csv" class="form-control-file">
+
+                            <!-- Used for file url-->
+                           	<input type="hidden" id="file_url" name="file_url" value="">
+
                             <br> 
                 
-                        <button type="submit" id="submit" class="btn btn-block btn-primary mt-3"> <i class="fas fa-plus"></i>
-                            Upload File</button>
+                        <button type="submit" id="submit" class="btn btn-block btn-primary mt-3 disabled"> <i class="fas fa-plus"></i>
+                            Submit</button>
                     </div>
                 </form>
             </div>
@@ -106,8 +110,72 @@
 
 </script>
 
-<script>
-   
+
+<script type="text/javascript">
+    
+    (function() {
+        document.getElementById("file").onchange = function(){
+        var files = document.getElementById("file").files;
+        var file = files[0];
+        if(!file){
+            return alert("No file selected.");
+        }
+        getSignedRequest(file);
+        };
+    })();
+
+    function getSignedRequest(file){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/signed-url?file_name="+file.name);
+        xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4){
+            if(xhr.status === 200){
+                var response = JSON.parse(xhr.responseText);
+                uploadFile(file, response.url);
+            }
+            else {
+                alert("Could not get signed URL.");
+            }
+        }
+        };
+        xhr.send();
+    }
+
+    function uploadFile(file, url){
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", url);
+        document.getElementById("message").innerHTML = "Started to upload.. Please wait..";
+        var postData = new FormData();
+      //  for(key in s3Data.fields){
+       //     postData.append(key, s3Data.fields[key]);
+       // }
+        postData.append('file', file);
+
+        xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4){
+            if(xhr.status === 200 || xhr.status === 204){
+                document.getElementById("message").innerHTML = "Upload completed please, submit.";
+                document.getElementById("file_url").value = url;
+                document.getElementById("submit").classList.remove("disabled");
+
+            }
+        else{
+            document.getElementById("message").innerHTML = "";
+            alert("Could not upload file.");
+
+            }
+        }
+        };
+        xhr.send(postData);
+    }
+
+</script>
+
+
+
+{% comment %} <script>
+   // FOR AJAX Upload of file
+
     $(document).on('submit', '#form', function(e){
         var form = $(this);
 	    var form_data = new FormData();
@@ -127,10 +195,8 @@
             processData: false,
             beforeSend: function(){
                 $('#submit').html('<i class="fa fa-spinner fa-spin"></i> Uploading..');
-                
             }, 
             success: function (data) {
-              // alert(data.msg)
                 $('#submit').html(data.msg);
 
             },
@@ -141,6 +207,6 @@
         })
         return false;
     });
-</script>
+</script> {% endcomment %}
 
 {% endblock javascript %}

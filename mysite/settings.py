@@ -142,5 +142,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CELERY_BROKER_URL = os.environ.get('CLOUDAMQP_URL', 'amqp://localhost') 
 
+AWS_S3_BUCKET = os.environ.get('AWS_S3_BUCKET', 'mirapayments')
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY', 'AKIAW2HSXLCNBQ6HNXR6')
+AWS_SECRET_KEY = os.environ.get('AWS_SECRET_KEY', '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')
+AWS_S3_REGION_NAME = 'us-east-2' 
+AWS_S3_SIGNATURE_VERSION = 's3v4' 
+AWS_S3_FILE_OVERWRITE = False 
+AWS_QUERYSTRING_AUTH = False
 
 django_heroku.settings(locals())
