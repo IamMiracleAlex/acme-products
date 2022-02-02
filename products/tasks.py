@@ -1,7 +1,6 @@
 import random
 
 from celery import shared_task
-import pandas as pd
 
 from products.models import Product
 
