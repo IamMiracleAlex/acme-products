@@ -1,6 +1,7 @@
 import random
 
 from celery import shared_task
+import pandas as pd
 
 from products.models import Product
 
@@ -22,6 +23,7 @@ def process_task(self, reader_list, ):
                 product = Product.objects.create(name=row[0], sku=row[1], is_active=is_active, description=row[2])
 
     except Exception as err:
+        print('CELERY ERROR:', err)
         self.retry(countdown=3, max_retries=5, exc=err)
 
     return 'Succeeded'

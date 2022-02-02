@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CELERY_BROKER_URL = os.environ.get('CLOUDAMQP_URL', 'amqp://localhost') 
 
-AWS_S3_BUCKET = os.environ.get('AWS_S3_BUCKET', )
+AWS_S3_BUCKET = os.environ.get('AWS_S3_BUCKET', 'mirapayments')
 AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY', )
 AWS_SECRET_KEY = os.environ.get('AWS_SECRET_KEY', )
 AWS_S3_REGION_NAME = 'us-east-2' 

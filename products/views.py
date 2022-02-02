@@ -1,5 +1,4 @@
 import csv, codecs, json, time
-from mysite.settings import AWS_S3_BUCKET
 from datetime import timedelta
 from zipfile import ZipFile
 
@@ -126,19 +125,6 @@ def products_bulk_upload(request):
     if request.method == 'GET':
         return render(request, 'products/products_bulk_upload.html',)
 
-    # Usage: Upload url (Using AWS)
-    file_url = request.POST.get('file_url')
-
-    # process file and send to celery
-    with open(file_url, "r") as new_file:
-        reader = csv.reader(new_file)
-        next(reader)
-        reader_list = list(reader)
-        process_task.delay(reader_list)
-
-    messages.success(request, 'Products upload in progress!', extra_tags='alert')
-    return redirect('products_bulk_upload')
-
     #Usage: Upload zip with Ajax, extract and read
     # print('is_ajax', request.is_ajax())
 
@@ -170,33 +156,6 @@ def products_bulk_upload(request):
 
     # return redirect('products_bulk_upload')
 
-@csrf_exempt
-def signed_url(request):
-    file_name = request.GET.get('file_name')
-    # file_type = request.GET.get('file_type')
-
-    #Usage: Upload CSV to S3
-    print('is_ajax', request.is_ajax())
-
-    client = boto3.client('s3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY, 
-                aws_secret_access_key=settings.AWS_SECRET_KEY,
-        )
-    presigned_url = client.generate_presigned_url(
-            ClientMethod = 'put_object',
-            Params = {
-                'Bucket': settings.AWS_S3_BUCKET,
-                'Key': file_name
-            },
-            ExpiresIn = 3600
-    )
-  
-    print(presigned_url)
-
-    return JsonResponse({
-        'url': presigned_url,
-        # 'url': 'https://%s.s3.amazonaws.com/%s' % (AWS_S3_BUCKET, file_name)
-        })
 
 def stream_response(request):
 
@@ -273,3 +232,32 @@ class WebHookCreateView(generic.CreateView):
     def get_success_url(self):
         messages.success(self.request, 'Webhook added successfully', extra_tags='alert')
         return super().get_success_url()
+
+
+def get_uploaded_file(request):
+
+    # Usage: Uploaded file url (Using AWS)
+    file_name = request.GET.get('file_name')
+    print('file_name:', file_name)
+
+    client = boto3.client('s3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY, 
+                aws_secret_access_key=settings.AWS_SECRET_KEY,
+        )
+
+    file_path = '/tmp/' + file_name
+
+    # Download csv file and store on `/tmp/`
+    print("Downloading the csv file...")
+    key = f"{settings.AWS_S3_BUCKET}/{file_name}"
+    client.download_file(settings.AWS_S3_BUCKET, key, file_path)
+
+    # read downloaded file
+    with open(file_path, "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+        reader_list = list(reader)
+        process_task.delay(reader_list)
+        # process_task(reader_list)
+
+    return JsonResponse({'msg': 'Processing your CSV file'})
