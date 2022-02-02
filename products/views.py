@@ -247,13 +247,19 @@ def get_uploaded_file(request):
 
     file_path = '/tmp/' + file_name
 
-    # Download csv file and store on `/tmp/`
+    # Download zipped file and store on `/tmp/`
     print("Downloading the csv file...")
     key = f"{settings.AWS_S3_BUCKET}/{file_name}"
     client.download_file(settings.AWS_S3_BUCKET, key, file_path)
 
+    # zipped_file = request.FILES.get('file')
+    ZipFile(file_path).extractall("/tmp")
+
+    unzipped_file = '/tmp/' + file_name.split('.')[0] + '.csv'
+    print('unzipped_file:', unzipped_file)
+
     # read downloaded file
-    with open(file_path, "r") as f:
+    with open(unzipped_file, "r") as f:
         reader = csv.reader(f)
         next(reader)
         reader_list = list(reader)
