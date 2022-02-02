@@ -151,19 +151,16 @@
                 }, function(err, data) {
                 if(err) {
                     reject('error');
+                    $('#message').html('Upload failed, error occured while uploading file..')
+                     $('#button').html('<i class="fas fa-plus"></i> Submit');
+
                 }
                     console.log('data:', data)
                     $('#message').html('Upload completed, sending file url to server..')
-                    //alert('Successfully Uploaded!');
-
 
                     $.ajax({
                         url: `/uploaded-file/?file_name=${fileName}`,
                         type: 'get',
-                       
-                       // beforeSend: function(){
-                       //     $('#submit').html('<i class="fa fa-spinner fa-spin"></i> Uploading..');
-                       // }, 
                         success: function (data) {
                             $('#message').html(data.msg);
                             $('#button').html('<i class="fas fa-plus"></i> Submit');
@@ -173,8 +170,6 @@
                         error: function (data) {
                             $('#message').html('File processing failed, please try again later..')
                             $('#button').html('<i class="fas fa-plus"></i> Submit');
-
-                           // alert('An unexpected error occurred') // display error response
                         },
                     })
 
