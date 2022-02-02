@@ -151,6 +151,7 @@
                 }, function(err, data) {
                 if(err) {
                     reject('error');
+                    console.log('Upload error', err)
                     $('#message').html('Upload failed, error occured while uploading file..')
                      $('#button').html('<i class="fas fa-plus"></i> Submit');
 
