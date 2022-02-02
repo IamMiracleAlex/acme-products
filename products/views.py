@@ -257,7 +257,14 @@ def get_uploaded_file(request):
         reader = csv.reader(f)
         next(reader)
         reader_list = list(reader)
-        process_task.delay(reader_list)
+        count = len(reader_list)
+        step = 10000
+    
+        for i in range(0, count, step):
+            chunks = reader_list[i:i+step]
+            # print(chunks)
+            process_task.delay(chunks)
+            time.sleep(30)
         # process_task(reader_list)
 
     return JsonResponse({'msg': 'Processing your CSV file'})
