@@ -264,7 +264,7 @@ def get_uploaded_file(request):
         next(reader)
         reader_list = list(reader)
         count = len(reader_list)
-        step = 2500
+        step = 2000
     
         for i in range(0, count, step):
             chunks = reader_list[i:i+step]
