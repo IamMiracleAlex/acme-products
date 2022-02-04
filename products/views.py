@@ -275,4 +275,4 @@ def get_uploaded_file(request):
         #     time.sleep(50)
         # # process_task(reader_list)
 
-    return JsonResponse({'msg': 'Processing your CSV file'})
+    return JsonResponse({'msg': 'Processing your CSV file, please wait...'})
