@@ -1,5 +1,5 @@
 # Intro
-An application to load about 500,000 rows of csv data into the database, full CRUD operations and advanced search and filters. Also solves the server timeout error when uploading via the browser on a server
+An application to load about 500,000 rows of csv data into the database, full CRUD operations and advanced search and filters. Also solves the server timeout error when uploading via the browser on a server (By integrating with AWS)
 
 # Local Setup
 1.  clone the repository
