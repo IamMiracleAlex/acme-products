@@ -1,3 +1,6 @@
+# Intro
+An application to load about 500,000 rows of csv data into the database, full CRUD operations and advanced search and filters. Also solves the server timeout error when uploading via the browser on a server
+
 # Local Setup
 1.  clone the repository
 2.  create a virtual environment running python 3.8 (or above) - and activate it
